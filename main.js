@@ -1,16 +1,15 @@
-function Tab (name, url, favicon, created) {
+function Tab (name, url, favicon, created, pinned) {
   this.name = name;
   this.url = url;
   this.favicon = favicon;
   this.created = created;
-
+  this.pinned = pinned;
 }
 
 let currentTabs = [];
 
 const query = browser.tabs.query({currentWindow:true}).then(query => {
   const now = new Date().toUTCString();
-
   const noPinned = query.filter(tab => !tab.pinned);
 
   return noPinned.map(tab => {
@@ -41,10 +40,18 @@ function openSession () {
   const tabs = Array(... document.querySelectorAll('.tab'));
 
   const urls = tabs.map(tab => {
-    return tab.childNodes[5].childNodes[3].textContent.trim();
+    return tab.getElementsByClassName('tab__url')[0].textContent.trim();
   });
 
-  browser.windows.create({ url: urls });
+  const pins = tabs.filter(tab => {
+    return tab.dataset.pinned == "true";
+  });
+
+  browser.windows.create({ url: urls }).then((newWindow) => {
+    newWindow.tabs.slice(0, pins.length).map((tab, index) => {
+      browser.tabs.update(tab.id, { pinned: true });
+    });
+  });
 }
 
 function displaySidebar () {
@@ -111,7 +118,7 @@ function displaySession (array) {
   tabs.innerHTML = array.map((tab, index) => {
     index++;
 
-    return `<li class="tab">
+    return `<li class="tab" data-pinned="${tab.pinned}">
       <a class="tab__number">${index}</a>
       <img type="image/ico" class="tab__favicon" src="${tab.favicon || ''}" />
       <div class="tab__links">
@@ -234,7 +241,7 @@ function saveEdit () {
   }
 
   const tabsObj = tabs.map(tab => {
-    return new Tab(tab.childNodes[5].childNodes[1].textContent.trim(), tab.childNodes[5].childNodes[3].textContent.trim(), tab.childNodes[3].src, date);
+    return new Tab(tab.childNodes[5].childNodes[1].textContent.trim(), tab.childNodes[5].childNodes[3].textContent.trim(), tab.childNodes[3].src, date, tab.pinned);
   });
 
   if (tabsObj.length < 1) {
