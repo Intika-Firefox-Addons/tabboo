@@ -6,8 +6,6 @@ function Tab (name, url, favicon, created, pinned) {
   this.pinned = pinned
 }
 
-let currentTabs = []
-
 const query = browser.tabs.query({ currentWindow: true }).then(query => {
   const now = new Date().toUTCString()
   const noPinned = query.filter(tab => !tab.pinned)
@@ -140,8 +138,6 @@ function displaySession (array) {
 
   document.querySelector('.session__amount').innerHTML = `<span class="amount__number session__number">${array.length}</span> ${multipleTabs} `
   document.querySelector('.session__date').innerHTML = array[0].created
-
-  currentTabs = array
 }
 
 function nameSession (resolve, elName, e) {
