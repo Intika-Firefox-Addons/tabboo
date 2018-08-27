@@ -34,6 +34,12 @@ query.then(array => {
   elSaveEdit.addEventListener('click', saveEdit)
 })
 
+function handleResponse(message) {
+}
+
+function handleError(error) {
+}
+
 function openSession () {
   const tabs = Array(... document.querySelectorAll('.tab'))
 
@@ -45,11 +51,12 @@ function openSession () {
     return tab.dataset.pinned == "true"
   })
 
-  browser.windows.create({ url: urls }).then((newWindow) => {
-    newWindow.tabs.slice(0, pins.length).map((tab, index) => {
-      browser.tabs.update(tab.id, { pinned: true })
-    })
+  var sending = browser.runtime.sendMessage({
+    message: 'window_opened',
+    urls: urls,
+    pinsCount: pins.length
   })
+  sending.then(handleResponse, handleError);
 }
 
 function displaySidebar () {
