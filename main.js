@@ -8,10 +8,9 @@ function Tab (name, url, favicon, created, pinned) {
 
 const query = browser.tabs.query({ currentWindow: true }).then(query => {
   const now = new Date().toUTCString()
-  const noPinned = query.filter(tab => !tab.pinned)
 
-  return noPinned.map(tab => {
-    return new Tab(tab.title, tab.url, tab.favIconUrl || 'images/icon__missing.png', now)
+  return query.map(tab => {
+    return new Tab(tab.title, tab.url, tab.favIconUrl || 'images/icon__missing.png', now, tab.pinned)
   }).filter(tab => !tab.url.search('http'))
 })
 
