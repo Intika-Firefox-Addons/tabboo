@@ -33,12 +33,6 @@ query.then(array => {
   elSaveEdit.addEventListener('click', saveEdit)
 })
 
-function handleResponse(message) {
-}
-
-function handleError(error) {
-}
-
 function openSession () {
   const tabs = Array(... document.querySelectorAll('.tab'))
 
@@ -55,7 +49,6 @@ function openSession () {
     urls: urls,
     pinsCount: pins.length
   })
-  sending.then(handleResponse, handleError);
 }
 
 function displaySidebar () {
